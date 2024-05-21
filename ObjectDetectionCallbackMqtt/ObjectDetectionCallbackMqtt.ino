@@ -177,6 +177,7 @@ void loop()
 // User callback function for post processing of object detection results
 void ODPostProcess(std::vector<ObjectDetectionResult> results)
 {
+    uint8_t object_number[3]={0,0,0};
     uint16_t im_h = config.height();
     uint16_t im_w = config.width();
 
@@ -203,6 +204,8 @@ void ODPostProcess(std::vector<ObjectDetectionResult> results)
                 int ymin = (int)(item.yMin() * im_h);
                 int ymax = (int)(item.yMax() * im_h);
 
+                object_number[obj_type]++;
+
                 // Draw boundary box
                 printf("Item %d %s:\t%d %d %d %d\n\r", i, itemList[obj_type].objectName, xmin, xmax, ymin, ymax);
                 OSD.drawRect(CHANNEL, xmin, ymin, xmax, ymax, 3, OSD_COLOR_WHITE);
@@ -213,7 +216,7 @@ void ODPostProcess(std::vector<ObjectDetectionResult> results)
                 OSD.drawText(CHANNEL, xmin, ymin - OSD.getTextHeight(CHANNEL), text_str, OSD_COLOR_CYAN);
 
                 char text_str2[128];
-                snprintf(text_str2, sizeof(text_str2), "Item %d %s:\t%d %d %d %d", i, itemList[obj_type].objectName, xmin, xmax, ymin, ymax);
+                snprintf(text_str2, sizeof(text_str2), "%s:%d\t,%s:%d\t,%s:%d\t", itemList[0].objectName, object_number[0], itemList[1].objectName, object_number[1], itemList[2].objectName,object_number[2]);
                 client.publish(publishTopic, text_str2);
             }
         }
